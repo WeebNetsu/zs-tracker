@@ -28,7 +28,15 @@ class _HomePageState extends State<HomePage> {
         children: sleeps.map((sleep) => SleepTimeContainer(sleep)).toList(),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () {
+          // below will go to /add on button pressed
+          // note, this will push a new screen ontop of our screen, so our screen
+          // will still exist!
+          // the appbar will then also have a <- arrow to pop the current screen and come back
+          // to this screen
+          // https://youtu.be/Xnp6ptZVs1g
+          Navigator.pushNamed(context, "/add");
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.nightlight_round_rounded),
       ), // This trailing comma makes auto-formatting nicer for build methods.
