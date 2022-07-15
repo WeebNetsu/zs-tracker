@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
+import 'package:zs_tracker/utils.dart' as utils;
 
 class AddTimePage extends StatefulWidget {
   const AddTimePage({super.key, required this.title});
@@ -18,6 +23,8 @@ class _AddTimePageState extends State<AddTimePage> {
     "show": false,
     "message": "Some error has happened"
   };
+  int _rating = 0;
+  final _notesField = TextEditingController();
 
   void _getNewDateTime(bool setStartDate) async {
     // if we're setting the end date before the start date
@@ -82,6 +89,44 @@ class _AddTimePageState extends State<AddTimePage> {
     return true;
   }
 
+  void _saveData() async {
+    Directory? appDir = await utils.getAppDir();
+
+    if (_startDate == null || _endDate == null || appDir == null) return;
+
+    // if (_notesField.text.isEmpty) return;
+
+    print(_notesField.text);
+
+    final data = SleepModel(_startDate!, _endDate!, _rating, _notesField.text);
+
+    // create will not overwrite existing data
+    final newFile = await File("${appDir.path}/save.json").create();
+
+    try {
+      // if the file is empty, don't append , at the start of the json!
+      if (newFile.readAsLinesSync().isEmpty) {
+        await newFile.writeAsString(
+          jsonEncode(data.toJson()),
+          mode: FileMode.append,
+        );
+      } else {
+        await newFile.writeAsString(
+          ",${jsonEncode(data.toJson())}",
+          mode: FileMode.append,
+        );
+      }
+
+      finishUp();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void finishUp() {
+    Navigator.pop(context, {"reload": true});
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
@@ -93,6 +138,7 @@ class _AddTimePageState extends State<AddTimePage> {
         padding: const EdgeInsets.only(top: 30.0, bottom: 30),
         child: Column(
           children: [
+            // Add dates
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -121,6 +167,8 @@ class _AddTimePageState extends State<AddTimePage> {
               ],
             ),
             const SizedBox(height: 20),
+
+            // Add rating
             Container(
               alignment: Alignment.center,
               child: RatingBar.builder(
@@ -128,26 +176,35 @@ class _AddTimePageState extends State<AddTimePage> {
                   Icons.star,
                   color: Colors.yellow[200],
                 ),
-                onRatingUpdate: (rating) {},
+                onRatingUpdate: (double rating) {
+                  setState(() {
+                    _rating = rating.round();
+                  });
+                },
               ),
             ),
             const SizedBox(height: 20),
-            const Input(
+
+            // Add notes
+            Input(
               title: "Notes",
               maxLines: 4,
+              contollerItem: _notesField,
             ),
             const SizedBox(height: 20),
+
+            // Save/Cancel
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 MaterialButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(context, {"reload": false}),
                   disabledColor: Colors.grey[400],
                   color: theme.primary,
                   child: const Text("Cancel"),
                 ),
                 MaterialButton(
-                  onPressed: _allowSave() ? () => Navigator.pop(context) : null,
+                  onPressed: _allowSave() ? _saveData : null,
                   color: theme.primary,
                   disabledColor: Colors.grey[400],
                   child: const Text("Save"),

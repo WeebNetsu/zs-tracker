@@ -1,30 +1,47 @@
 import 'dart:math';
 
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class SleepModel {
-  final DateTime _startTime;
+  final DateTime _startTime, _endTime;
   // duration is in minutes;
-  final int _duration;
+  // final int _duration;
   // 0 - 5
   late int _rating;
+  final String _notes;
+  late String _id;
+  final uuid = const Uuid();
 
-  SleepModel(this._startTime, this._duration, rating) {
+  SleepModel(this._startTime, this._endTime, int rating, this._notes,
+      {String? id}) {
+    _id = id ?? uuid.v4();
     // rating is maxed at 5 and minimumed at 0
     _rating = max(min(rating, 5), 0);
   }
 
-  DateTime getStartTime() {
-    return _startTime;
-  }
+  SleepModel.fromJSON(dynamic json)
+      : this(
+          DateTime.parse(json['start']),
+          DateTime.parse(json['end']),
+          json['rating'],
+          json['notes'],
+          id: json['id'],
+        );
 
-  DateTime getEndTime() {
-    return _startTime.add(Duration(minutes: _duration));
-  }
+  Map<String, dynamic> toJson() => {
+        'id': _id,
+        'start': _startTime.toString(),
+        'end': _endTime.toString(),
+        'rating': _rating,
+        'notes': _notes,
+      };
 
-  String getDateStr() {
-    return DateFormat("dd MMM yyyy").format(_startTime);
-  }
+  DateTime getStartTime() => _startTime;
+  String getDateStr() => DateFormat("dd MMM yyyy").format(_startTime);
+  int getDuration() => _endTime.difference(_startTime).inMinutes;
+  int getRating() => _rating;
+  String getNotes() => _notes;
 
   String getStartTimeStr() {
     String hour = _startTime.hour.toString();
@@ -37,25 +54,17 @@ class SleepModel {
   }
 
   String getEndTimeStr() {
-    DateTime endTime = getEndTime();
-    int hours = endTime.hour;
-    int minutes = endTime.minute;
+    int hours = _endTime.hour;
+    int minutes = _endTime.minute;
 
     return "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}";
   }
 
-  int getDuration() {
-    return _duration;
-  }
-
   String getDurationHHMM() {
-    int hours = (_duration / 60).floorToDouble().toInt();
-    int minutes = _duration - (hours * 60);
+    int dur = getDuration();
+    int hours = (dur / 60).floorToDouble().toInt();
+    int minutes = dur - (hours * 60);
 
     return "${hours}h ${minutes < 10 ? '0$minutes' : minutes}m";
-  }
-
-  int getRating() {
-    return _rating;
   }
 }

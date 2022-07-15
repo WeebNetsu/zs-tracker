@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
 class Input extends StatefulWidget {
-  const Input({super.key, required this.title, this.maxLines});
   final String title;
   final int? maxLines; // if should be multi-line
+  final TextEditingController? contollerItem;
+
+  const Input({
+    super.key,
+    required this.title,
+    this.maxLines,
+    this.contollerItem,
+  });
 
   @override
   State<Input> createState() => _Input();
@@ -24,6 +31,7 @@ class _Input extends State<Input> {
           padding: const EdgeInsets.only(left: 15),
           child: TextField(
             maxLines: widget.maxLines,
+            controller: widget.contollerItem,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: widget.title,
