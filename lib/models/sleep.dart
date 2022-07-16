@@ -39,16 +39,18 @@ class SleepModel {
         'notes': _notes,
       };
 
-  DateTime getStartTime() => _startTime;
-
   /// Get start time date as a string in format `dd MMM yyyy` (ie. 15 Jul 2022)
   String getStartDateStr() => DateFormat("dd MMM yyyy").format(_startTime);
   String getEndDateStr() => DateFormat("dd MMM yyyy").format(_endTime);
 
+  String get id => _id;
+  DateTime get startTime => _startTime;
+  DateTime get endTime => _endTime;
+
   /// Get sleep duration in minutes
-  int getDuration() => _endTime.difference(_startTime).inMinutes;
-  int getRating() => _rating;
-  String getNotes() => _notes;
+  int get duration => _endTime.difference(_startTime).inMinutes;
+  int get rating => _rating;
+  String get notes => _notes;
 
   /// Get start time as a string. ie. `19:02`
   String getStartTimeStr() {
@@ -71,7 +73,7 @@ class SleepModel {
 
   /// Get sleep duration as an HH:MM string
   String getDurationHHMM() {
-    int dur = getDuration();
+    int dur = duration;
     int hours = (dur / 60).floorToDouble().toInt();
     int minutes = dur - (hours * 60);
 

@@ -5,7 +5,7 @@ Duration calculateTimeSlept(List<SleepModel> sleeps) {
   int minutes = 0;
 
   for (var sleep in sleeps) {
-    minutes += sleep.getDuration();
+    minutes += sleep.duration;
   }
 
   return Duration(minutes: minutes);
@@ -16,7 +16,7 @@ double calculateAvgSleptRating(List<SleepModel> sleeps) {
   double rating = 0;
 
   for (var sleep in sleeps) {
-    rating += sleep.getRating();
+    rating += sleep.rating;
   }
 
   if (rating <= 0) return 0;

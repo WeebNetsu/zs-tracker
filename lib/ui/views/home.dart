@@ -47,8 +47,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     // sort eariliest date first
-    sleeps.sort((a, b) =>
-        a.getStartTime().difference(b.getStartTime()).inMinutes < 0 ? 1 : 0);
+    sleeps.sort(
+        (a, b) => a.startTime.difference(b.startTime).inMinutes < 0 ? 1 : 0);
 
     setState(() {
       _sleeps = sleeps;
@@ -60,6 +60,12 @@ class _HomePageState extends State<HomePage> {
   // void initState() {
   //   super.initState();
   // }
+
+  void _reloadData() async {
+    setState(() {
+      _loadingData = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,50 +81,58 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _loadingData
           ? const CircularProgressIndicator()
-          : Column(
+          : ListView(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 8, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DashItem(
-                        windowWidth: windowWidth,
-                        title: "Time Slept",
-                        child: Text(formatDuration(timeSlept)),
-                      ),
-                      DashItem(
-                        windowWidth: windowWidth,
-                        title: 'Average Rating',
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(calculateAvgSleptRating(_sleeps).toString()),
-                            Icon(
-                              Icons.star_border,
-                              color: Colors.yellow[200],
-                              size: 16,
+                Column(
+                  children: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 10, left: 8, right: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          DashItem(
+                            windowWidth: windowWidth,
+                            title: "Time Slept",
+                            child: Text(formatDuration(timeSlept)),
+                          ),
+                          DashItem(
+                            windowWidth: windowWidth,
+                            title: 'Average Rating',
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(calculateAvgSleptRating(_sleeps)
+                                    .toString()),
+                                Icon(
+                                  Icons.star_border,
+                                  color: Colors.yellow[200],
+                                  size: 16,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          DashItem(
+                            windowWidth: windowWidth,
+                            title: "Average Sleep",
+                            child: Text(
+                              timeSlept.inMinutes < 1
+                                  ? formatDuration(const Duration(minutes: 0))
+                                  : formatDuration(Duration(
+                                      minutes:
+                                          (timeSlept.inMinutes / _sleeps.length)
+                                              .round(),
+                                    )),
+                            ),
+                          ),
+                        ],
                       ),
-                      DashItem(
-                        windowWidth: windowWidth,
-                        title: "Average Sleep",
-                        child: Text(
-                          timeSlept.inMinutes < 1
-                              ? formatDuration(const Duration(minutes: 0))
-                              : formatDuration(Duration(
-                                  minutes:
-                                      (timeSlept.inMinutes / _sleeps.length)
-                                          .round(),
-                                )),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    ..._sleeps
+                        .map((sleep) => SleepTimeContainer(sleep, _reloadData))
+                        .toList()
+                  ],
                 ),
-                ..._sleeps.map((sleep) => SleepTimeContainer(sleep)).toList()
               ],
             ),
       floatingActionButton: FloatingActionButton(

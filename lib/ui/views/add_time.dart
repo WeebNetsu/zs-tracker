@@ -8,6 +8,12 @@ import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
 import 'package:zs_tracker/utils/app.dart' as utils;
 
+class AddTimePageArguments {
+  final SleepModel? sleepData;
+
+  AddTimePageArguments(this.sleepData);
+}
+
 class AddTimePage extends StatefulWidget {
   const AddTimePage({super.key, required this.title});
 
@@ -19,6 +25,9 @@ class AddTimePage extends StatefulWidget {
 
 class _AddTimePageState extends State<AddTimePage> {
   DateTime? _startDate, _endDate;
+  String? _id; // if editing and not adding
+  bool _loading = true;
+
   final Map<String, dynamic> _error = {
     "show": false,
     "message": "Some error has happened"
@@ -32,7 +41,8 @@ class _AddTimePageState extends State<AddTimePage> {
 
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: setStartDate ? DateTime.now() : _startDate!,
+      initialDate:
+          setStartDate ? _startDate ?? DateTime.now() : _endDate ?? _startDate!,
       firstDate: setStartDate ? DateTime.parse("2022-01-01") : _startDate!,
       lastDate: DateTime.now(),
     );
@@ -40,7 +50,8 @@ class _AddTimePageState extends State<AddTimePage> {
     if (date == null) return;
 
     TimeOfDay? time;
-    bool getTime = !setStartDate && date.day == _startDate!.day;
+    // bool getTime = !setStartDate && date.day == _startDate!.day;
+
     time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -121,13 +132,84 @@ class _AddTimePageState extends State<AddTimePage> {
     }
   }
 
+  void _editData() async {
+    Directory? appDir = await utils.getAppDir();
+
+    if (_startDate == null || _endDate == null || appDir == null) return;
+
+    final newFile = File("${appDir.path}/save.json");
+
+    if (!(await newFile.exists())) return;
+
+    try {
+      final fileText = await newFile.readAsString();
+
+      if (fileText.isEmpty) {
+        finishUp();
+        return;
+      }
+
+      final sleepJson = jsonDecode("[$fileText]");
+      String newSleeps = "";
+      for (var sleep in sleepJson) {
+        var modal = SleepModel.fromJSON(sleep);
+
+        // if it's the modal we're looking for, overwrite it
+        if (modal.id == _id) {
+          modal = SleepModel(_startDate!, _endDate!, _rating, _notesField.text,
+              id: _id);
+        }
+
+        newSleeps += "${jsonEncode(modal.toJson())},";
+      }
+
+      // remove last character from string, aka ","
+      if (newSleeps.isNotEmpty) {
+        newSleeps = newSleeps.substring(0, newSleeps.length - 1);
+      }
+
+      // if the file is empty, don't append , at the start of the json!
+      await newFile.writeAsString(
+        newSleeps,
+        mode: FileMode.write,
+      );
+
+      finishUp();
+    } catch (err) {
+      print(err);
+    }
+  }
+
   void finishUp() {
-    Navigator.pop(context, {"reload": true});
+    Navigator.pop(context, {
+      "reload": true,
+      "newData": SleepModel(_startDate ?? DateTime.now(),
+          _endDate ?? DateTime.now(), _rating, _notesField.text,
+          id: _id)
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    final routeData =
+        ModalRoute.of(context)?.settings.arguments as AddTimePageArguments?;
+
+    if (routeData != null && _loading) {
+      setState(() {
+        if (routeData.sleepData != null) {
+          final SleepModel data = routeData.sleepData!;
+          _startDate = data.startTime;
+          _endDate = data.endTime;
+          _rating = data.rating;
+          _notesField.text = data.notes;
+          _id = data.id;
+
+          _loading = false;
+        }
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -174,6 +256,7 @@ class _AddTimePageState extends State<AddTimePage> {
                   Icons.star,
                   color: Colors.yellow[200],
                 ),
+                initialRating: _rating.toDouble(),
                 onRatingUpdate: (double rating) {
                   setState(() {
                     _rating = rating.round();
@@ -202,7 +285,11 @@ class _AddTimePageState extends State<AddTimePage> {
                   child: const Text("Cancel"),
                 ),
                 MaterialButton(
-                  onPressed: _allowSave() ? _saveData : null,
+                  onPressed: _allowSave()
+                      ? _id == null
+                          ? _saveData
+                          : _editData
+                      : null,
                   color: theme.primary,
                   disabledColor: Colors.grey[400],
                   child: const Text("Save"),
