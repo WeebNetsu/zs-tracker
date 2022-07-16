@@ -20,6 +20,7 @@ class SleepModel {
     _rating = max(min(rating, 5), 0);
   }
 
+  /// Create a modal from JSON (Map) data
   SleepModel.fromJSON(dynamic json)
       : this(
           DateTime.parse(json['start']),
@@ -29,6 +30,7 @@ class SleepModel {
           id: json['id'],
         );
 
+  /// Convert model data to JSON format
   Map<String, dynamic> toJson() => {
         'id': _id,
         'start': _startTime.toString(),
@@ -38,11 +40,16 @@ class SleepModel {
       };
 
   DateTime getStartTime() => _startTime;
+
+  /// Get start time date as a string in format `dd MMM yyyy` (ie. 15 Jul 2022)
   String getDateStr() => DateFormat("dd MMM yyyy").format(_startTime);
+
+  /// Get sleep duration in minutes
   int getDuration() => _endTime.difference(_startTime).inMinutes;
   int getRating() => _rating;
   String getNotes() => _notes;
 
+  /// Get start time as a string. ie. `19:02`
   String getStartTimeStr() {
     String hour = _startTime.hour.toString();
     String minute = _startTime.minute.toString();
@@ -53,6 +60,7 @@ class SleepModel {
     return "$hour:$minute";
   }
 
+  /// Get end time as a string. ie. `19:02`
   String getEndTimeStr() {
     int hours = _endTime.hour;
     int minutes = _endTime.minute;
@@ -60,6 +68,7 @@ class SleepModel {
     return "${hours < 10 ? '0$hours' : hours}:${minutes < 10 ? '0$minutes' : minutes}";
   }
 
+  /// Get sleep duration as an HH:MM string
   String getDurationHHMM() {
     int dur = getDuration();
     int hours = (dur / 60).floorToDouble().toInt();

@@ -3,8 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/models/sleep.dart';
+import 'package:zs_tracker/ui/widgets/dash_item.dart';
 import 'package:zs_tracker/ui/widgets/sleep_time_container.dart';
-import 'package:zs_tracker/utils.dart';
+import 'package:zs_tracker/utils/app.dart';
+import 'package:zs_tracker/utils/data_calculations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -38,13 +40,6 @@ class _HomePageState extends State<HomePage> {
     final sleepJson = jsonDecode("[$saveData]");
     final List<SleepModel> sleeps = [];
     for (var sleep in sleepJson) {
-      // print('0 ' + sleep.runtimeType.toString());
-      // print('1 ' + sleep["id"].runtimeType.toString());
-      // print('2 ' + sleep["start"].runtimeType.toString());
-      // print('3 ' + sleep["end"].runtimeType.toString());
-      // print('4 ' + sleep["rating"].runtimeType.toString());
-      // print('5 ' + sleep["notes"].runtimeType.toString());
-      print(sleep);
       sleeps.add(
         SleepModel.fromJSON(sleep),
       );
@@ -52,7 +47,7 @@ class _HomePageState extends State<HomePage> {
 
     // sort eariliest date first
     sleeps.sort((a, b) =>
-        a.getStartTime().difference(b.getStartTime()).inMinutes.compareTo(0));
+        a.getStartTime().difference(b.getStartTime()).inMinutes < 0 ? 1 : 0);
 
     setState(() {
       _sleeps = sleeps;
@@ -63,13 +58,15 @@ class _HomePageState extends State<HomePage> {
   // @override
   // void initState() {
   //   super.initState();
-  //   _loadSleepData();
   // }
 
   @override
   Widget build(BuildContext context) {
     if (_loadingData) _loadSleepData();
-    // _loadSleepData();
+    final windowWidth = MediaQuery.of(context).size.width;
+    final colorScheme = Theme.of(context).colorScheme;
+    final timeSlept = calculateTimeSlept(_sleeps);
+    // final windowHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -78,8 +75,50 @@ class _HomePageState extends State<HomePage> {
       body: _loadingData
           ? const CircularProgressIndicator()
           : Column(
-              children:
-                  _sleeps.map((sleep) => SleepTimeContainer(sleep)).toList(),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 8, right: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      DashItem(
+                        windowWidth: windowWidth,
+                        title: "Time Slept",
+                        child: Text(formatDuration(timeSlept)),
+                      ),
+                      DashItem(
+                        windowWidth: windowWidth,
+                        title: 'Average Rating',
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(calculateAvgSleptRating(_sleeps).toString()),
+                            Icon(
+                              Icons.star_border,
+                              color: Colors.yellow[200],
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                      DashItem(
+                        windowWidth: windowWidth,
+                        title: "Average Sleep",
+                        child: Text(
+                          timeSlept.inMinutes < 1
+                              ? formatDuration(const Duration(minutes: 0))
+                              : formatDuration(Duration(
+                                  minutes:
+                                      (timeSlept.inMinutes / _sleeps.length)
+                                          .round(),
+                                )),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                ..._sleeps.map((sleep) => SleepTimeContainer(sleep)).toList()
+              ],
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -95,8 +134,9 @@ class _HomePageState extends State<HomePage> {
           });
         },
         tooltip: 'Increment',
+        backgroundColor: colorScheme.primary,
         child: const Icon(Icons.nightlight_round_rounded),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
       backgroundColor: Colors.grey[900],
     );
   }

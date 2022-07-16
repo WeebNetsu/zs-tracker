@@ -6,7 +6,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
-import 'package:zs_tracker/utils.dart' as utils;
+import 'package:zs_tracker/utils/app.dart' as utils;
 
 class AddTimePage extends StatefulWidget {
   const AddTimePage({super.key, required this.title});
@@ -95,8 +95,6 @@ class _AddTimePageState extends State<AddTimePage> {
     if (_startDate == null || _endDate == null || appDir == null) return;
 
     // if (_notesField.text.isEmpty) return;
-
-    print(_notesField.text);
 
     final data = SleepModel(_startDate!, _endDate!, _rating, _notesField.text);
 
