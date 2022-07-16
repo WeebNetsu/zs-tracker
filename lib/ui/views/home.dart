@@ -142,8 +142,10 @@ class _HomePageState extends State<HomePage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(calculateAvgSleptRating(_sleeps)
-                                    .toStringAsFixed(2)),
+                                Text(
+                                  calculateAvgSleptRating(_sleeps)
+                                      .toStringAsFixed(2),
+                                ),
                                 Icon(
                                   Icons.star_border,
                                   color: Colors.yellow[200],
@@ -189,7 +191,7 @@ class _HomePageState extends State<HomePage> {
             if (data != null) _loadingData = data['reload'];
           });
         },
-        tooltip: 'Increment',
+        tooltip: 'Add Sleep',
         backgroundColor: colorScheme.primary,
         child: const Icon(Icons.nightlight_round_rounded),
       ),

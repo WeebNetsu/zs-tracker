@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({super.key});
 
-  Widget _buildMenuItem({
+  Widget _buildMenuItem(
+    BuildContext context, {
     required String text,
     required IconData icon,
+    required String url,
   }) {
     const color = Colors.white;
 
@@ -15,7 +17,7 @@ class NavigationDrawer extends StatelessWidget {
         text,
         style: const TextStyle(color: color),
       ),
-      onTap: () {},
+      onTap: () => Navigator.pushNamed(context, url),
     );
   }
 
@@ -32,8 +34,10 @@ class NavigationDrawer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           children: [
             const SizedBox(height: 50),
-            _buildMenuItem(text: "Stats", icon: Icons.bar_chart),
-            _buildMenuItem(text: "Settings", icon: Icons.settings),
+            _buildMenuItem(context,
+                text: "Stats", icon: Icons.bar_chart, url: ""),
+            _buildMenuItem(context,
+                text: "Settings", icon: Icons.settings, url: "/settings"),
           ],
         ),
       ),
