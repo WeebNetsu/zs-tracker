@@ -42,7 +42,8 @@ class SleepModel {
   DateTime getStartTime() => _startTime;
 
   /// Get start time date as a string in format `dd MMM yyyy` (ie. 15 Jul 2022)
-  String getDateStr() => DateFormat("dd MMM yyyy").format(_startTime);
+  String getStartDateStr() => DateFormat("dd MMM yyyy").format(_startTime);
+  String getEndDateStr() => DateFormat("dd MMM yyyy").format(_endTime);
 
   /// Get sleep duration in minutes
   int getDuration() => _endTime.difference(_startTime).inMinutes;
