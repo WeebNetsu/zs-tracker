@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/views/add_time.dart';
+import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/ui/widgets/star_row.dart';
 
 class ViewTimePageArguments {
@@ -41,6 +42,7 @@ class _ViewTimePageState extends State<ViewTimePage> {
     if (_sleepData == null) Navigator.pop(context);
 
     return Scaffold(
+      drawer: NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),

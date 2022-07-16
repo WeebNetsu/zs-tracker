@@ -15,8 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Colors.blue,
-          // #E35C06
+          primary: Colors.blue[800],
           secondary: const Color.fromRGBO(227, 92, 6, 1),
         ),
         textTheme: Theme.of(context).textTheme.apply(

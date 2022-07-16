@@ -6,6 +6,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
+import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/utils/app.dart' as utils;
 
 class AddTimePageArguments {
@@ -211,6 +212,7 @@ class _AddTimePageState extends State<AddTimePage> {
     }
 
     return Scaffold(
+      drawer: NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),

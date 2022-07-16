@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/dash_item.dart';
+import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/ui/widgets/sleep_time_container.dart';
 import 'package:zs_tracker/utils/app.dart';
 import 'package:zs_tracker/utils/data_calculations.dart';
@@ -76,6 +77,7 @@ class _HomePageState extends State<HomePage> {
     // final windowHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      drawer: _loadingData ? null : NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),
