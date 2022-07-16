@@ -68,16 +68,54 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _deleteItem(String id) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(
+          content: const Text("Item Deleted"),
+          action: SnackBarAction(
+            label: "Undo",
+            onPressed: _reloadData,
+            textColor: Colors.blue[800],
+          ),
+          // behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red[500],
+          elevation: 1,
+        ))
+        .closed
+        .then(
+      (value) async {
+        // if undo is not clicked
+        if (value != SnackBarClosedReason.action) {
+          List<SleepModel> newSleeps = [];
+          for (var sleep in _sleeps) {
+            if (sleep.id != id) {
+              newSleeps.add(sleep);
+            }
+          }
+
+          bool saved = await saveSleepData(items: newSleeps);
+
+          if (!saved) {
+            // todo show error
+          }
+
+          setState(() {
+            _loadingData = true;
+          });
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loadingData) _loadSleepData();
     final windowWidth = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
     final timeSlept = calculateTimeSlept(_sleeps);
-    // final windowHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      drawer: _loadingData ? null : NavigationDrawer(),
+      drawer: _loadingData ? null : const NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),
@@ -105,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(calculateAvgSleptRating(_sleeps)
-                                    .toString()),
+                                    .toStringAsFixed(2)),
                                 Icon(
                                   Icons.star_border,
                                   color: Colors.yellow[200],
@@ -131,7 +169,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     ..._sleeps
-                        .map((sleep) => SleepTimeContainer(sleep, _reloadData))
+                        .map((sleep) => SleepTimeContainer(sleep,
+                            reloadData: _reloadData, deleteItem: _deleteItem))
                         .toList()
                   ],
                 ),

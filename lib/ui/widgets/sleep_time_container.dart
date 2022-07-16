@@ -6,10 +6,12 @@ import 'package:zs_tracker/ui/views/view_time.dart';
 import 'package:zs_tracker/ui/widgets/star_row.dart';
 
 class SleepTimeContainer extends StatefulWidget {
-  final SleepModel? _data;
-  final Function _reloadData;
+  final SleepModel? data;
+  final Function reloadData;
+  final Function deleteItem;
 
-  const SleepTimeContainer(this._data, this._reloadData, {super.key});
+  const SleepTimeContainer(this.data,
+      {super.key, required this.reloadData, required this.deleteItem});
 
   @override
   State<SleepTimeContainer> createState() => _SleepTimeContainer();
@@ -23,7 +25,7 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
     // final previewWidth = windowWidth / 2 - 12;
 
     // if loading data
-    if (widget._data == null) return const CircularProgressIndicator();
+    if (widget.data == null) return const CircularProgressIndicator();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(7, 7, 7, 0),
@@ -33,12 +35,12 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
           await Navigator.pushNamed(
             context,
             "/view",
-            arguments: ViewTimePageArguments(widget._data!),
+            arguments: ViewTimePageArguments(widget.data!),
           );
 
           // this can be permance issue later on, but for right now, it makes life easy
           // todo: change once we have more experience in flutter later
-          widget._reloadData();
+          widget.reloadData();
         },
         color: Colors.transparent,
         child: ClipRRect(
@@ -50,15 +52,16 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
             onSwiped: (direction) async {
               // if delete
               if (direction == SwipeDirection.endToStart) {
+                widget.deleteItem(widget.data!.id);
               } else {
                 await Navigator.pushNamed(
                   context,
                   '/edit',
-                  arguments: AddTimePageArguments(widget._data),
+                  arguments: AddTimePageArguments(widget.data),
                 );
 
                 // we just need to refresh afterwards
-                widget._reloadData();
+                widget.reloadData();
               }
             },
             backgroundBuilder: (context, direction, progress) {
@@ -105,7 +108,7 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Sleep Time: ${widget._data!.getStartTimeStr()} - ${widget._data!.getEndTimeStr()}",
+                          "Sleep Time: ${widget.data!.getStartTimeStr()} - ${widget.data!.getEndTimeStr()}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[300],
@@ -113,7 +116,7 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "Slept For: ${widget._data!.getDurationHHMM()}",
+                          "Slept For: ${widget.data!.getDurationHHMM()}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[300],
@@ -125,14 +128,14 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
                     Column(
                       children: [
                         Text(
-                          widget._data!.getStartDateStr(),
+                          widget.data!.getStartDateStr(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[300],
                           ),
                         ),
                         const SizedBox(height: 10),
-                        StarRow(rating: widget._data!.rating),
+                        StarRow(rating: widget.data!.rating),
                       ],
                     ),
                   ],

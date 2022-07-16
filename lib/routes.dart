@@ -4,16 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:zs_tracker/ui/views/view_time.dart';
 
 Map<String, Widget Function(BuildContext)> routes = {
-  "/": (context) => const HomePage(
-        title: 'Z\'s Tracker',
-      ),
-  "/add": (context) => const AddTimePage(
-        title: 'Add Time',
-      ),
-  "/edit": (context) => const AddTimePage(
-        title: 'Edit Time',
-      ),
-  "/view": (context) => const ViewTimePage(
-        title: 'View Time',
-      ),
+  "/": (context) => const HomePage(title: 'Z\'s Tracker'),
+  "/add": (context) => const AddTimePage(title: 'Add Time'),
+  "/edit": (context) => const AddTimePage(title: 'Edit Time'),
+  "/view": (context) => const ViewTimePage(title: 'View Time'),
 };

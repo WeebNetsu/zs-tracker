@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({super.key});
+
   Widget _buildMenuItem({
     required String text,
     required IconData icon,
@@ -11,7 +13,7 @@ class NavigationDrawer extends StatelessWidget {
       leading: Icon(icon, color: color),
       title: Text(
         text,
-        style: TextStyle(color: color),
+        style: const TextStyle(color: color),
       ),
       onTap: () {},
     );
@@ -27,10 +29,10 @@ class NavigationDrawer extends StatelessWidget {
       child: Material(
         color: colorScheme.primary,
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           children: [
-            SizedBox(height: 50),
-            _buildMenuItem(text: "Data", icon: Icons.bar_chart),
+            const SizedBox(height: 50),
+            _buildMenuItem(text: "Stats", icon: Icons.bar_chart),
             _buildMenuItem(text: "Settings", icon: Icons.settings),
           ],
         ),

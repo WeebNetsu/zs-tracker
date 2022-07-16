@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
 import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
-import 'package:zs_tracker/utils/app.dart' as utils;
+import 'package:zs_tracker/utils/app.dart';
 
 class AddTimePageArguments {
   final SleepModel? sleepData;
@@ -102,39 +102,24 @@ class _AddTimePageState extends State<AddTimePage> {
   }
 
   void _saveData() async {
-    Directory? appDir = await utils.getAppDir();
+    Directory? appDir = await getAppDir();
 
     if (_startDate == null || _endDate == null || appDir == null) return;
 
-    // if (_notesField.text.isEmpty) return;
-
     final data = SleepModel(_startDate!, _endDate!, _rating, _notesField.text);
 
-    // create will not overwrite existing data
-    final newFile = await File("${appDir.path}/save.json").create();
+    bool saved = await saveSleepData(item: data);
 
-    try {
-      // if the file is empty, don't append , at the start of the json!
-      if (newFile.readAsLinesSync().isEmpty) {
-        await newFile.writeAsString(
-          jsonEncode(data.toJson()),
-          mode: FileMode.append,
-        );
-      } else {
-        await newFile.writeAsString(
-          ",${jsonEncode(data.toJson())}",
-          mode: FileMode.append,
-        );
-      }
-
+    if (saved) {
       finishUp();
-    } catch (err) {
-      print(err);
+      return;
     }
+
+    // todo show error
   }
 
   void _editData() async {
-    Directory? appDir = await utils.getAppDir();
+    Directory? appDir = await getAppDir();
 
     if (_startDate == null || _endDate == null || appDir == null) return;
 
@@ -212,7 +197,7 @@ class _AddTimePageState extends State<AddTimePage> {
     }
 
     return Scaffold(
-      drawer: NavigationDrawer(),
+      drawer: const NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),

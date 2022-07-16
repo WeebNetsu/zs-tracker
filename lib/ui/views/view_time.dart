@@ -42,7 +42,7 @@ class _ViewTimePageState extends State<ViewTimePage> {
     if (_sleepData == null) Navigator.pop(context);
 
     return Scaffold(
-      drawer: NavigationDrawer(),
+      drawer: const NavigationDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
       ),
@@ -167,7 +167,7 @@ class _ViewTimePageState extends State<ViewTimePage> {
             ),
           ),
         ],
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
       backgroundColor: Colors.grey[900],
     );
   }

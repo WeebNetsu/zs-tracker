@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
               displayColor: Colors.grey[300],
             ),
       ),
-      // home: const HomePage(title: 'Z\'s Tracker'),
       routes: routes,
     );
   }
