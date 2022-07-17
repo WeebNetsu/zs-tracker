@@ -34,10 +34,18 @@ class NavigationDrawer extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           children: [
             const SizedBox(height: 50),
-            _buildMenuItem(context,
-                text: "Stats", icon: Icons.bar_chart, url: ""),
-            _buildMenuItem(context,
-                text: "Settings", icon: Icons.settings, url: "/settings"),
+            _buildMenuItem(
+              context,
+              text: "Stats",
+              icon: Icons.bar_chart,
+              url: "/stats",
+            ),
+            _buildMenuItem(
+              context,
+              text: "Settings",
+              icon: Icons.settings,
+              url: "/settings",
+            ),
           ],
         ),
       ),

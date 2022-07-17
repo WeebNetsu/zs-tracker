@@ -1,5 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.weebnetsu.zs_tracker">
+
+   <!-- required permissions for save file export and importing -->
+   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+   <!-- 
+    Android 10 & up, HOWEVER, this will not allow the app to be in playstore if 
+    it is not part of the core functionallity of the app, so only use if creating a file
+    manager, gallery etc. 
+    -->
+   <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/> -->
+
    <application
         android:label="Z's Tracker"
         android:name="${applicationName}"
