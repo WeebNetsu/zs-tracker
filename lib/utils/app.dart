@@ -69,12 +69,18 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
   return false;
 }
 
-Future<List<SleepModel>?> loadSleepData([bool sort = true]) async {
+/// Load sleep data. If `filePath` is provided, read sleep data from the provided path file,
+///
+/// else read the data from our save.json in our app directory
+Future<List<SleepModel>?> loadSleepData({
+  String? filePath,
+  bool sort = true,
+}) async {
   final Directory? appDir = await getAppDir();
 
   if (appDir == null) return null;
 
-  final File saveFile = File("${appDir.path}/save.json");
+  final File saveFile = File(filePath ?? "${appDir.path}/save.json");
 
   if (!saveFile.existsSync()) {
     return null;

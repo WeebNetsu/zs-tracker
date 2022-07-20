@@ -3,6 +3,7 @@ import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/views/add_time.dart';
 import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/ui/widgets/star_row.dart';
+import 'package:zs_tracker/utils/views.dart';
 
 class ViewTimePageArguments {
   final SleepModel sleepData;
@@ -27,14 +28,11 @@ class _ViewTimePageState extends State<ViewTimePage> {
   Widget build(BuildContext context) {
     final windowWidth = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
-
-    final routeData =
-        ModalRoute.of(context)?.settings.arguments as ViewTimePageArguments?;
-    if (routeData == null) Navigator.pop(context);
+    final routeData = getRouteData(context) as ViewTimePageArguments;
 
     if (_loading) {
       setState(() {
-        _sleepData = routeData!.sleepData;
+        _sleepData = routeData.sleepData;
         _loading = false;
       });
     }

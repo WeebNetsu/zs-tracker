@@ -1,10 +1,11 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/utils/app.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -23,9 +24,6 @@ class _SettingsPageState extends State<SettingsPage> {
   // for now we'll just share the backed up file
   // https://stackoverflow.com/questions/73012513/write-file-to-directory-with-allowed-access-on-android
   Future<void> _exportData() async {
-    setState(() {
-      _loading = true;
-    });
     // All available permissions for permission handler:
     // https://github.com/Baseflow/flutter-permission-handler/blob/master/permission_handler/example/android/app/src/main/AndroidManifest.xml
     // Either the permission was already granted before or the user just granted it.
@@ -76,10 +74,34 @@ class _SettingsPageState extends State<SettingsPage> {
     //   "Hello World",
     //   mode: FileMode.write,
     // );
+  }
 
-    setState(() {
-      _loading = false;
-    });
+  Future<void> _importData() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result == null) return;
+
+    // todo throw error
+    if (result.files.length != 1) return;
+
+    PlatformFile file = result.files[0];
+
+    // todo throw error
+    if (file.extension != "sav" || file.path == null) return;
+
+    // we try to parse the data
+    // todo do error handling
+    List<SleepModel>? sleeps = await loadSleepData(filePath: file.path);
+
+    // todo throw error
+    if (sleeps == null) return;
+
+    bool importSuccess = await saveSleepData(items: sleeps);
+
+    // todo thow error
+    if (!importSuccess) return;
+
+    // todo show message if success
   }
 
   @override
@@ -98,13 +120,34 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               MaterialButton(
                 onPressed: () async {
+                  setState(() {
+                    _loading = true;
+                  });
+
                   await _exportData();
+
+                  setState(() {
+                    _loading = false;
+                  });
                 },
                 color: colorScheme.primary,
                 child: const Text("Export Data"),
               ),
               MaterialButton(
-                onPressed: () {},
+                onPressed: () async {
+                  // todo show warning that this will overwrite any already
+                  // existing data
+
+                  setState(() {
+                    _loading = true;
+                  });
+
+                  await _importData();
+
+                  setState(() {
+                    _loading = false;
+                  });
+                },
                 color: colorScheme.primary,
                 child: const Text("Import Data"),
               ),

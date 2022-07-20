@@ -7,11 +7,15 @@ import 'package:zs_tracker/ui/widgets/star_row.dart';
 
 class SleepTimeContainer extends StatefulWidget {
   final SleepModel? data;
-  final Function reloadData;
+  final Future<void> Function() reloadData;
   final Function deleteItem;
 
-  const SleepTimeContainer(this.data,
-      {super.key, required this.reloadData, required this.deleteItem});
+  const SleepTimeContainer(
+    this.data, {
+    super.key,
+    required this.reloadData,
+    required this.deleteItem,
+  });
 
   @override
   State<SleepTimeContainer> createState() => _SleepTimeContainer();
@@ -40,7 +44,7 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
 
           // this can be permance issue later on, but for right now, it makes life easy
           // todo: change once we have more experience in flutter later
-          widget.reloadData();
+          await widget.reloadData();
         },
         color: Colors.transparent,
         child: ClipRRect(
@@ -61,7 +65,7 @@ class _SleepTimeContainer extends State<SleepTimeContainer> {
                 );
 
                 // we just need to refresh afterwards
-                widget.reloadData();
+                await widget.reloadData();
               }
             },
             backgroundBuilder: (context, direction, progress) {

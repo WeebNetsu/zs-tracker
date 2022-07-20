@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/dash_item.dart';
@@ -44,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   //   super.initState();
   // }
 
-  void _reloadData() async {
+  Future<void> _reloadData() async {
     setState(() {
       _loadingData = true;
     });
@@ -97,7 +94,7 @@ class _HomePageState extends State<HomePage> {
     final timeSlept = calculateTimeSlept(_sleeps);
 
     return Scaffold(
-      drawer: _loadingData ? null : const NavigationDrawer(),
+      drawer: _loadingData ? null : NavigationDrawer(reloadData: _reloadData),
       appBar: AppBar(
         title: Text(widget.title),
       ),
@@ -142,19 +139,26 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               timeSlept.inMinutes < 1
                                   ? formatDuration(const Duration(minutes: 0))
-                                  : formatDuration(Duration(
-                                      minutes:
-                                          (timeSlept.inMinutes / _sleeps.length)
-                                              .round(),
-                                    )),
+                                  : formatDuration(
+                                      Duration(
+                                        minutes: (timeSlept.inMinutes /
+                                                _sleeps.length)
+                                            .round(),
+                                      ),
+                                    ),
                             ),
                           ),
                         ],
                       ),
                     ),
                     ..._sleeps
-                        .map((sleep) => SleepTimeContainer(sleep,
-                            reloadData: _reloadData, deleteItem: _deleteItem))
+                        .map(
+                          (sleep) => SleepTimeContainer(
+                            sleep,
+                            reloadData: _reloadData,
+                            deleteItem: _deleteItem,
+                          ),
+                        )
                         .toList()
                   ],
                 ),

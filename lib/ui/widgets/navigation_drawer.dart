@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({super.key});
+  final Future<void> Function()? reloadData;
+
+  const NavigationDrawer({super.key, this.reloadData});
 
   Widget _buildMenuItem(
     BuildContext context, {
@@ -17,7 +19,16 @@ class NavigationDrawer extends StatelessWidget {
         text,
         style: const TextStyle(color: color),
       ),
-      onTap: () => Navigator.pushNamed(context, url),
+      onTap: () async {
+        await Navigator.pushNamed(
+          context,
+          url,
+        );
+
+        // todo 'package:flutter/src/widgets/framework.dart': Failed assertion: line 4506 pos 12: '_lifecycleState != _ElementLifecycle.defunct': is not true.
+        // we need to reload the home page on exit of other page
+        if (reloadData != null) await reloadData!();
+      },
     );
   }
 

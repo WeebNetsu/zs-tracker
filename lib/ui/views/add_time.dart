@@ -8,6 +8,7 @@ import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/input.dart';
 import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/utils/app.dart';
+import 'package:zs_tracker/utils/views.dart';
 
 class AddTimePageArguments {
   final SleepModel? sleepData;
@@ -178,8 +179,10 @@ class _AddTimePageState extends State<AddTimePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
-    final routeData =
-        ModalRoute.of(context)?.settings.arguments as AddTimePageArguments?;
+    final routeData = getRouteData(
+      context,
+      popRouteOnNull: false,
+    ) as AddTimePageArguments?;
 
     if (routeData != null && _loading) {
       setState(() {
