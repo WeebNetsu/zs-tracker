@@ -68,3 +68,34 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
 
   return false;
 }
+
+Future<List<SleepModel>?> loadSleepData([bool sort = true]) async {
+  final Directory? appDir = await getAppDir();
+
+  if (appDir == null) return null;
+
+  final File saveFile = File("${appDir.path}/save.json");
+
+  if (!saveFile.existsSync()) {
+    return null;
+  }
+
+  final saveData = await saveFile.readAsString();
+
+  final sleepJson = jsonDecode("[$saveData]");
+  final List<SleepModel> sleeps = [];
+  for (var sleep in sleepJson) {
+    sleeps.add(
+      SleepModel.fromJSON(sleep),
+    );
+  }
+
+  if (sort) {
+    // sort eariliest date first
+    sleeps.sort(
+      (a, b) => a.startTime.difference(b.startTime).inMinutes < 0 ? 1 : 0,
+    );
+  }
+
+  return sleeps;
+}

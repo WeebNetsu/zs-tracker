@@ -23,33 +23,15 @@ class _HomePageState extends State<HomePage> {
   List<SleepModel> _sleeps = [];
   bool _loadingData = true;
 
-  Future<void> _loadSleepData() async {
-    final Directory? appDir = await getAppDir();
+  Future<void> _loadData() async {
+    final sleeps = await loadSleepData();
 
-    if (appDir == null) return;
-
-    final File saveFile = File("${appDir.path}/save.json");
-
-    if (!saveFile.existsSync()) {
+    if (sleeps == null) {
       setState(() {
         _loadingData = false;
       });
       return;
     }
-
-    final saveData = await saveFile.readAsString();
-
-    final sleepJson = jsonDecode("[$saveData]");
-    final List<SleepModel> sleeps = [];
-    for (var sleep in sleepJson) {
-      sleeps.add(
-        SleepModel.fromJSON(sleep),
-      );
-    }
-
-    // sort eariliest date first
-    sleeps.sort(
-        (a, b) => a.startTime.difference(b.startTime).inMinutes < 0 ? 1 : 0);
 
     setState(() {
       _sleeps = sleeps;
@@ -109,7 +91,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loadingData) _loadSleepData();
+    if (_loadingData) _loadData();
     final windowWidth = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
     final timeSlept = calculateTimeSlept(_sleeps);
