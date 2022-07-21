@@ -10,3 +10,39 @@ String formatDuration(Duration dur) {
 
   return "${days > 0 ? '${days}d ' : ''}${hours > 0 ? '${hours}h ' : ''}${minutes > 0 ? '${minutes}m ' : ''}";
 }
+
+/// Convert DateTime.month to it's string form
+///
+/// ie. `convertMonthToString(DateTime.january) -> "january"`
+String convertMonthToString(int month) {
+  if (month > 12 || month < 1) {
+    throw RangeError("Is invalid, has to be between 1 and 12");
+  }
+
+  switch (month) {
+    case DateTime.january:
+      return "january";
+    case DateTime.february:
+      return "february";
+    case DateTime.march:
+      return "march";
+    case DateTime.april:
+      return "april";
+    case DateTime.may:
+      return "may";
+    case DateTime.june:
+      return "june";
+    case DateTime.july:
+      return "july";
+    case DateTime.august:
+      return "august";
+    case DateTime.september:
+      return "september";
+    case DateTime.october:
+      return "october";
+    case DateTime.november:
+      return "november";
+  }
+
+  return "december";
+}

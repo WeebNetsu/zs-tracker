@@ -1,10 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/models/sleep.dart';
-import 'package:zs_tracker/ui/widgets/dash_item.dart';
+import 'package:zs_tracker/ui/widgets/dash_row.dart';
 import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/ui/widgets/sleep_time_container.dart';
 import 'package:zs_tracker/utils/app.dart';
-import 'package:zs_tracker/utils/data_calculations.dart';
 import 'package:zs_tracker/utils/formatting.dart';
 
 class HomePage extends StatefulWidget {
@@ -86,12 +87,160 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Map<int, Map<String, List<SleepModel>>> _generateSleepMap(
+    Map<int, Map<String, List<SleepModel>>> sleeps,
+    SleepModel sleep,
+    int month,
+  ) {
+    var newSleeps = sleeps;
+    if (newSleeps[sleep.endTime.year] == null) {
+      newSleeps[sleep.endTime.year] = {};
+    }
+    if (newSleeps[sleep.endTime.year]![convertMonthToString(month)] == null) {
+      newSleeps[sleep.endTime.year]![convertMonthToString(month)] = [];
+    }
+
+    newSleeps[sleep.endTime.year]![convertMonthToString(month)]!.add(sleep);
+
+    return newSleeps;
+  }
+
+  List<Column> _buildSleepItems() {
+    Map<int, Map<String, List<SleepModel>>> sleeps = {};
+
+    for (var sleep in _sleeps) {
+      switch (sleep.endTime.month) {
+        case DateTime.january:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.january);
+          break;
+        case DateTime.february:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.february);
+          break;
+        case DateTime.march:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.march);
+          break;
+        case DateTime.april:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.april);
+          break;
+        case DateTime.may:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.may);
+          break;
+        case DateTime.june:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.june);
+          break;
+        case DateTime.july:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.july);
+          break;
+        case DateTime.august:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.august);
+          break;
+        case DateTime.september:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.september);
+          break;
+        case DateTime.october:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.october);
+          break;
+        case DateTime.november:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.november);
+          break;
+        case DateTime.december:
+          sleeps = _generateSleepMap(sleeps, sleep, DateTime.december);
+          break;
+      }
+    }
+
+    return sleeps.entries
+        .map(
+          (entry) => Column(
+            children: [
+              // don't show current year!
+              if (entry.key != DateTime.now().year)
+                Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 12, right: 12, top: 12),
+                      child: Divider(color: Colors.grey),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ...entry.key
+                              .toString()
+                              .split("")
+                              .map(
+                                (e) => Text(
+                                  e,
+                                  style: TextStyle(
+                                    // get random color
+                                    color: Colors.primaries[Random().nextInt(
+                                      Colors.primaries.length,
+                                    )],
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+              // for each month in year
+              ...entry.value.entries
+                  .map(
+                    (e) => Column(
+                      children: [
+                        if (e.key != convertMonthToString(DateTime.now().month))
+                          Column(
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Divider(color: Colors.grey),
+                              ),
+                              Text(
+                                e.key[0].toUpperCase() + e.key.substring(1),
+                              ),
+                            ],
+                          ),
+                        // capitalze first letter of month
+
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 10,
+                            left: 8,
+                            right: 8,
+                          ),
+                          child: DashRow(sleeps: e.value),
+                        ),
+
+                        // for each item in month
+                        ...e.value
+                            .map(
+                              (sleep) => SleepTimeContainer(
+                                sleep,
+                                reloadData: _reloadData,
+                                deleteItem: _deleteItem,
+                              ),
+                            )
+                            .toList(),
+                      ],
+                    ),
+                  )
+                  .toList(),
+            ],
+          ),
+          // entry.value.entries.map((e) => e.value);
+        )
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loadingData) _loadData();
-    final windowWidth = MediaQuery.of(context).size.width;
     final colorScheme = Theme.of(context).colorScheme;
-    final timeSlept = calculateTimeSlept(_sleeps);
 
     return Scaffold(
       drawer: _loadingData ? null : NavigationDrawer(reloadData: _reloadData),
@@ -104,62 +253,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Column(
                   children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 10, left: 8, right: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          DashItem(
-                            windowWidth: windowWidth,
-                            title: "Time Slept",
-                            child: Text(formatDuration(timeSlept)),
-                          ),
-                          DashItem(
-                            windowWidth: windowWidth,
-                            title: 'Average Rating',
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  calculateAvgSleptRating(_sleeps)
-                                      .toStringAsFixed(2),
-                                ),
-                                Icon(
-                                  Icons.star_border,
-                                  color: Colors.yellow[200],
-                                  size: 16,
-                                ),
-                              ],
-                            ),
-                          ),
-                          DashItem(
-                            windowWidth: windowWidth,
-                            title: "Average Sleep",
-                            child: Text(
-                              timeSlept.inMinutes < 1
-                                  ? formatDuration(const Duration(minutes: 0))
-                                  : formatDuration(
-                                      Duration(
-                                        minutes: (timeSlept.inMinutes /
-                                                _sleeps.length)
-                                            .round(),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ..._sleeps
-                        .map(
-                          (sleep) => SleepTimeContainer(
-                            sleep,
-                            reloadData: _reloadData,
-                            deleteItem: _deleteItem,
-                          ),
-                        )
-                        .toList()
+                    ..._buildSleepItems(),
                   ],
                 ),
               ],
