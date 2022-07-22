@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:zs_tracker/models/sleep.dart';
+import 'package:zs_tracker/services/local_notification.dart';
 import 'package:zs_tracker/utils/app.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -104,6 +105,28 @@ class _SettingsPageState extends State<SettingsPage> {
     // todo show message if success
   }
 
+  void _onNotficationListener(String? payload) {
+    if (payload != null && payload.isNotEmpty) {
+      print("Payload from settings: $payload");
+      Navigator.pushNamed(context, "/stats", arguments: {payload: payload});
+    }
+  }
+
+  void _listenToNotifcation() {
+    LocalNotificationService()
+        .onNotificationClick
+        .stream
+        .listen(_onNotficationListener);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // for notification with payload
+    _listenToNotifcation();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -114,44 +137,86 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         children: [
-          const SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              MaterialButton(
-                onPressed: () async {
-                  setState(() {
-                    _loading = true;
-                  });
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text("Rating System (between none, 5 or 10 stars)"),
+                Text("Theme (Light or Dark)"),
+                Text(
+                  "Notification (on/off - if on, when to recieve notification)",
+                ),
+                Text("Notifiction refers to reminder to add sleep times"),
 
-                  await _exportData();
+                MaterialButton(
+                  onPressed: () async {
+                    await LocalNotificationService()
+                        .showNotifcation(title: "test", body: "test 2");
+                  },
+                  child: Text("Show Notification"),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    await LocalNotificationService().showSheduledNotifcation(
+                      title: "test",
+                      body: "test that waited",
+                      seconds: 5,
+                    );
+                  },
+                  child: Text("Show Scheduled Notification"),
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    await LocalNotificationService().showNotifcation(
+                      title: "test",
+                      body: "test that waited",
+                      payload: "This is my data",
+                    );
+                  },
+                  child: Text("Show Payload Notification"),
+                ),
 
-                  setState(() {
-                    _loading = false;
-                  });
-                },
-                color: colorScheme.primary,
-                child: const Text("Export Data"),
-              ),
-              MaterialButton(
-                onPressed: () async {
-                  // todo show warning that this will overwrite any already
-                  // existing data
+                // Import/Export Data
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    MaterialButton(
+                      onPressed: () async {
+                        setState(() {
+                          _loading = true;
+                        });
 
-                  setState(() {
-                    _loading = true;
-                  });
+                        await _exportData();
 
-                  await _importData();
+                        setState(() {
+                          _loading = false;
+                        });
+                      },
+                      color: colorScheme.primary,
+                      child: const Text("Export Data"),
+                    ),
+                    MaterialButton(
+                      onPressed: () async {
+                        // todo show warning that this will overwrite any already
+                        // existing data
 
-                  setState(() {
-                    _loading = false;
-                  });
-                },
-                color: colorScheme.primary,
-                child: const Text("Import Data"),
-              ),
-            ],
+                        setState(() {
+                          _loading = true;
+                        });
+
+                        await _importData();
+
+                        setState(() {
+                          _loading = false;
+                        });
+                      },
+                      color: colorScheme.primary,
+                      child: const Text("Import Data"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -53,6 +53,10 @@ dependencies:
   graphic: ^0.10.5
   # open up share dialog to send something over social media
   share_plus: ^4.0.10
+  # to send the user notifications
+  flutter_local_notifications: ^9.7.0
+  timezone: ^0.8.0
+  rxdart: ^0.27.5
 
 dev_dependencies:
   flutter_test:

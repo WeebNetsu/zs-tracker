@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:zs_tracker/routes.dart';
+import 'package:zs_tracker/services/local_notification.dart';
 
 void main() {
+  // below will ensure that the notification service is intitialized
+  // for the entire app, so we don't have to intitialize it per page
+  WidgetsFlutterBinding.ensureInitialized();
+  LocalNotificationService().init();
+
   runApp(const MyApp());
 }
 
