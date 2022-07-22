@@ -200,12 +200,12 @@ class _HomePageState extends State<HomePage> {
                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                 child: Divider(color: Colors.grey),
                               ),
+                              // capitalze first letter of month
                               Text(
                                 e.key[0].toUpperCase() + e.key.substring(1),
                               ),
                             ],
                           ),
-                        // capitalze first letter of month
 
                         Padding(
                           padding: const EdgeInsets.only(
