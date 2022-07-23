@@ -201,9 +201,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Divider(color: Colors.grey),
                               ),
                               // capitalze first letter of month
-                              Text(
-                                e.key[0].toUpperCase() + e.key.substring(1),
-                              ),
+                              Text(capitalizeWord(e.key)),
                             ],
                           ),
 

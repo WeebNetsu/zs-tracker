@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:zs_tracker/models/settings.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/services/local_notification.dart';
+import 'package:zs_tracker/ui/widgets/star_row.dart';
 import 'package:zs_tracker/utils/app.dart';
+import 'package:zs_tracker/utils/formatting.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.title});
@@ -20,6 +23,8 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _loading = false;
+  final SettingsModel _settings = SettingsModel(5, "Dark", DateTime.now());
+  bool _receiveNotifications = true;
 
   // todo cannot export data, having permission issues
   // for now we'll just share the backed up file
@@ -141,19 +146,109 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                Text("Rating System (between none, 5 or 10 stars)"),
-                Text("Theme (Light or Dark)"),
-                Text(
-                  "Notification (on/off - if on, when to recieve notification)",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Rating System"),
+                    DropdownButton(
+                      value: _settings.ratingSystem,
+                      items: _settings.availableRatingSystems
+                          .map(
+                            (int rateSystem) => DropdownMenuItem(
+                              value: rateSystem,
+                              child: StarRow(
+                                rating: rateSystem,
+                                maxRating: rateSystem,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          if (value != null) _settings.ratingSystem = value;
+                        });
+                      },
+                      style: const TextStyle(backgroundColor: Colors.black),
+                      dropdownColor: Colors.grey[900],
+                    ),
+                  ],
                 ),
-                Text("Notifiction refers to reminder to add sleep times"),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Themes"),
+                      DropdownButton(
+                        value: _settings.theme,
+                        items: _settings.availableThemes
+                            .map(
+                              (String theme) => DropdownMenuItem(
+                                value: theme,
+                                child: Text(
+                                  capitalizeWord(theme),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            if (value != null) _settings.theme = value;
+                          });
+                        },
+                        style: const TextStyle(backgroundColor: Colors.black),
+                        dropdownColor: Colors.grey[900],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Receive Notifications?"),
+                      Switch(
+                        value: _receiveNotifications,
+                        onChanged: ((bool value) {
+                          setState(() {
+                            _receiveNotifications = value;
+                          });
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+
+                if (_receiveNotifications)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Send notification at"),
+                        MaterialButton(
+                          onPressed: () {},
+                          color: colorScheme.primary,
+                          child: const Text("Set Time"),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: 40),
+                const Text("Notifiction refers to reminder to add sleep times"),
 
                 MaterialButton(
                   onPressed: () async {
-                    await LocalNotificationService()
-                        .showNotifcation(title: "test", body: "test 2");
+                    await LocalNotificationService().showNotifcation(
+                      title: "test",
+                      body: "test 2",
+                    );
                   },
-                  child: Text("Show Notification"),
+                  child: const Text("Show Notification"),
                 ),
                 MaterialButton(
                   onPressed: () async {
@@ -163,7 +258,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       seconds: 5,
                     );
                   },
-                  child: Text("Show Scheduled Notification"),
+                  child: const Text("Show Scheduled Notification"),
                 ),
                 MaterialButton(
                   onPressed: () async {
@@ -173,7 +268,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       payload: "This is my data",
                     );
                   },
-                  child: Text("Show Payload Notification"),
+                  child: const Text("Show Payload Notification"),
                 ),
 
                 // Import/Export Data

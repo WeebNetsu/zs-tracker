@@ -46,3 +46,12 @@ String convertMonthToString(int month) {
 
   return "december";
 }
+
+/// Will capitalize the first letter of a word
+///
+/// ie. `mike -> Mike`
+String capitalizeWord(String word) {
+  if (word.isEmpty || word.length < 2) return word.toUpperCase();
+
+  return word[0].toUpperCase() + word.substring(1);
+}

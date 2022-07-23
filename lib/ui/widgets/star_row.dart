@@ -6,18 +6,20 @@ class StarRow extends StatelessWidget {
   const StarRow({
     Key? key,
     required int rating,
+    int maxRating = 5,
     double size = 23,
   })  : _rating = rating,
+        _maxRating = maxRating,
         _size = size,
         super(key: key);
 
-  final int _rating;
+  final int _rating, _maxRating;
   final double _size;
 
   @override
   Widget build(BuildContext context) {
-    final int fill = min(_rating, 5);
-    final int empty = 5 - fill;
+    final int fill = min(_rating, _maxRating);
+    final int empty = _maxRating - fill;
     List<Widget> row = [];
 
     for (var i = 0; i < fill; i++) {
