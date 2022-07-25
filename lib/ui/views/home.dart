@@ -7,6 +7,7 @@ import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
 import 'package:zs_tracker/ui/widgets/sleep_time_container.dart';
 import 'package:zs_tracker/utils/app.dart';
 import 'package:zs_tracker/utils/formatting.dart';
+import 'package:zs_tracker/utils/views.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -20,6 +21,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<SleepModel> _sleeps = [];
   bool _loadingData = true;
+
+  void displayError(String text) => showError(context, text);
 
   Future<void> _loadData() async {
     final sleeps = await loadSleepData();
@@ -76,7 +79,8 @@ class _HomePageState extends State<HomePage> {
           bool saved = await saveSleepData(items: newSleeps);
 
           if (!saved) {
-            // todo show error
+            displayError("Could not delete item");
+            return;
           }
 
           setState(() {

@@ -29,13 +29,16 @@ class _AddTimePageState extends State<AddTimePage> {
   DateTime? _startDate, _endDate;
   String? _id; // if editing and not adding
   bool _loading = true;
+  int _rating = 0;
+  final _notesField = TextEditingController();
 
   final Map<String, dynamic> _error = {
     "show": false,
     "message": "Some error has happened"
   };
-  int _rating = 0;
-  final _notesField = TextEditingController();
+
+  // so we don't use context over async gaps
+  void displayError(String text) => showError(context, text);
 
   void _getNewDateTime(bool setStartDate) async {
     // if we're setting the end date before the start date
@@ -111,12 +114,12 @@ class _AddTimePageState extends State<AddTimePage> {
 
     bool saved = await saveSleepData(item: data);
 
-    if (saved) {
-      finishUp();
+    if (!saved) {
+      displayError("Could not save time");
       return;
     }
 
-    // todo show error
+    finishUp();
   }
 
   void _editData() async {

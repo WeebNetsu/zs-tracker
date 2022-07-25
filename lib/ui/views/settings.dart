@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,6 +12,7 @@ import 'package:zs_tracker/services/local_notification.dart';
 import 'package:zs_tracker/ui/widgets/star_row.dart';
 import 'package:zs_tracker/utils/app.dart';
 import 'package:zs_tracker/utils/formatting.dart';
+import 'package:zs_tracker/utils/views.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.title});
@@ -26,6 +28,9 @@ class _SettingsPageState extends State<SettingsPage> {
   final SettingsModel _settings = SettingsModel(5, "Dark", DateTime.now());
   bool _receiveNotifications = true;
 
+  void displayError(String text, [bool error = true]) =>
+      showError(context, text, error: error);
+
   // todo cannot export data, having permission issues
   // for now we'll just share the backed up file
   // https://stackoverflow.com/questions/73012513/write-file-to-directory-with-allowed-access-on-android
@@ -35,21 +40,38 @@ class _SettingsPageState extends State<SettingsPage> {
     // Either the permission was already granted before or the user just granted it.
     // only manage_external_storage can be used to write to custom directory, and unless it is a core
     // functionality of my app, Play Store will reject it, which we want to avoid, so we'll save to documents folder instead
-    // todo: show error instead of just returning
-    if (!(await Permission.storage.request().isGranted)) return;
+    if (!(await Permission.storage.request().isGranted)) {
+      displayError("Storage permission not granted");
+      return;
+    }
+
     Directory? appDir = await getAppDir();
 
-    // todo show error instead
-    if (appDir == null) return;
+    if (appDir == null) {
+      displayError(
+        "#1 An error occured while creating save file for exporting",
+      );
+      return;
+    }
 
-    File exportFile = await File(
-      "${appDir.path}/zs_tracker_data_${DateTime.now().toString().replaceAll(' ', '_')}.sav",
-    ).create(recursive: true);
+    File exportFile;
+    try {
+      exportFile = await File(
+        "${appDir.path}/zs_tracker_data_${DateTime.now().toString().replaceAll(' ', '_')}.sav",
+      ).create(recursive: true);
+    } on FileSystemException catch (e) {
+      debugPrint(e.toString());
+
+      displayError("Could not create save file");
+      return;
+    }
 
     final File saveFile = File("${appDir.path}/save.json");
 
     if (!saveFile.existsSync()) {
-      // todo return error
+      displayError(
+        "#2 An error occured while creating save file for exporting",
+      );
       return;
     }
 
@@ -58,11 +80,15 @@ class _SettingsPageState extends State<SettingsPage> {
       mode: FileMode.write,
     );
 
-    await Share.shareFiles(
-      [exportFile.path],
-      text:
-          "My sleep data for ${DateFormat("dd MMMM yyyy").format(DateTime.now())}",
-    );
+    try {
+      await Share.shareFiles(
+        [exportFile.path],
+        text:
+            "My sleep data for ${DateFormat("dd MMMM yyyy").format(DateTime.now())}",
+      );
+    } catch (e) {
+      displayError("Error while sharing file");
+    }
 
     // if running into errors, https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup#android
     // find out where the user wants to export to
@@ -87,32 +113,39 @@ class _SettingsPageState extends State<SettingsPage> {
 
     if (result == null) return;
 
-    // todo throw error
-    if (result.files.length != 1) return;
+    if (result.files.length != 1) {
+      displayError("Invalid amount of files chosen");
+      return;
+    }
 
     PlatformFile file = result.files[0];
 
-    // todo throw error
-    if (file.extension != "sav" || file.path == null) return;
+    if (file.extension != "sav" || file.path == null) {
+      displayError("File should be of .sav type");
+      return;
+    }
 
     // we try to parse the data
-    // todo do error handling
     List<SleepModel>? sleeps = await loadSleepData(filePath: file.path);
 
-    // todo throw error
-    if (sleeps == null) return;
+    if (sleeps == null) {
+      displayError("Sleep data could not be loaded");
+      return;
+    }
 
     bool importSuccess = await saveSleepData(items: sleeps);
 
-    // todo thow error
-    if (!importSuccess) return;
+    if (!importSuccess) {
+      displayError("Could not save imported data");
+      return;
+    }
 
-    // todo show message if success
+    displayError("Data have been imported successfully!", false);
   }
 
   void _onNotficationListener(String? payload) {
     if (payload != null && payload.isNotEmpty) {
-      print("Payload from settings: $payload");
+      debugPrint("Payload from settings: $payload");
       Navigator.pushNamed(context, "/stats", arguments: {payload: payload});
     }
   }
