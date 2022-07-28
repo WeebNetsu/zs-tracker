@@ -61,6 +61,15 @@ class _StatsPageState extends State<StatsPage> {
       (a, b) => a["day"]! > b["day"]! ? 1 : 0,
     );
 
+    // star: timesUsed
+    List<Map<String, int>> sleepRatings = [
+      {"stars": 1, "count": 4},
+      {"stars": 2, "count": 2},
+      {"stars": 3, "count": 9},
+      {"stars": 4, "count": 3},
+      {"stars": 5, "count": 1}
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -117,6 +126,40 @@ class _StatsPageState extends State<StatsPage> {
                       ),
                     },
                     elements: [LineElement(), PointElement()],
+                    axes: [
+                      Defaults.horizontalAxis,
+                      Defaults.verticalAxis,
+                    ],
+                  ),
+                ),
+
+                const Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Center(
+                    child: Text(
+                      "Sleep Ratings",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 300,
+                  child: Chart(
+                    data: sleepRatings,
+                    variables: {
+                      'stars': Variable(
+                        accessor: (Map<String, int> rating) =>
+                            rating["stars"] as int,
+                      ),
+                      'rating': Variable(
+                        accessor: (Map<String, int> rating) =>
+                            rating["count"] as int,
+                      ),
+                    },
+                    elements: [IntervalElement()],
                     axes: [
                       Defaults.horizontalAxis,
                       Defaults.verticalAxis,
