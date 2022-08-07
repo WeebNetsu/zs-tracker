@@ -198,7 +198,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           .toList(),
                       onChanged: (value) {
                         setState(() {
-                          if (value != null) _settings.ratingSystem = value;
+                          if (value != null) {
+                            _settings.ratingSystem = value as int;
+                          }
                         });
                       },
                       style: const TextStyle(backgroundColor: Colors.black),
@@ -227,7 +229,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             .toList(),
                         onChanged: (value) {
                           setState(() {
-                            if (value != null) _settings.theme = value;
+                            if (value != null) {
+                              _settings.theme = value as String;
+                            }
                           });
                         },
                         style: const TextStyle(backgroundColor: Colors.black),

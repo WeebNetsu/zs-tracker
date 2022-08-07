@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
     Map<int, Map<String, List<SleepModel>>> sleeps = {};
 
     for (var sleep in _sleeps) {
-      switch (sleep.endTime.month) {
+      switch (sleep.startTime.month) {
         case DateTime.january:
           sleeps = _generateSleepMap(sleeps, sleep, DateTime.january);
           break;

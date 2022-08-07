@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+generated_plugin_registrant.dart
 
 # IntelliJ related
 *.iml

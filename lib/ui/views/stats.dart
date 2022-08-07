@@ -38,7 +38,16 @@ class _StatsPageState extends State<StatsPage> {
   Widget build(BuildContext context) {
     if (_loadingData) _loadData();
 
-    var filteredSleeps = _sleeps
+    List<SleepModel> selectedSleeps = [];
+    final DateTime currentDate = DateTime.now();
+    for (var sleep in _sleeps) {
+      if (sleep.endTime.month == currentDate.month) {
+        selectedSleeps.add(sleep);
+        print(sleep.endTime);
+      }
+    }
+
+    var filteredSleeps = selectedSleeps
         .map(
           (sleep) => {
             "day": sleep.endTime.day,
@@ -105,7 +114,7 @@ class _StatsPageState extends State<StatsPage> {
                   padding: EdgeInsets.only(top: 20),
                   child: Center(
                     child: Text(
-                      "Sleep times for the last 29 days",
+                      "Sleep times for this month",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -137,7 +146,7 @@ class _StatsPageState extends State<StatsPage> {
                   padding: EdgeInsets.only(top: 20),
                   child: Center(
                     child: Text(
-                      "Sleep Ratings",
+                      "Sleep Ratings (All Time)",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
