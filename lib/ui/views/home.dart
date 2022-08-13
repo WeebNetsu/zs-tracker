@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:zs_tracker/models/sleep.dart';
 import 'package:zs_tracker/ui/widgets/dash_row.dart';
 import 'package:zs_tracker/ui/widgets/navigation_drawer.dart';
@@ -258,23 +259,45 @@ class _HomePageState extends State<HomePage> {
                     ..._buildSleepItems(),
                   ],
                 ),
+                const SizedBox(height: 20),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // below will go to /add on button pressed
-          // note, this will push a new screen ontop of our screen, so our screen
-          // will still exist!
-          // the appbar will then also have a <- arrow to pop the current screen and come back
-          // to this screen
-          // https://youtu.be/Xnp6ptZVs1g
-          dynamic data = await Navigator.pushNamed(context, "/add");
-          setState(() {
-            if (data != null) _loadingData = data['reload'];
-          });
-        },
+      floatingActionButton: SpeedDial(
+        overlayColor: const Color.fromRGBO(30, 30, 30, 1),
+        spaceBetweenChildren: 7,
+        spacing: 5,
+        backgroundColor: colorScheme.secondary,
         tooltip: 'Add Sleep',
-        backgroundColor: colorScheme.primary,
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.lock_clock),
+            onTap: () async {
+              // below will go to /add on button pressed
+              // note, this will push a new screen ontop of our screen, so our screen
+              // will still exist!
+              // the appbar will then also have a <- arrow to pop the current screen and come back
+              // to this screen
+              // https://youtu.be/Xnp6ptZVs1g
+              dynamic data = await Navigator.pushNamed(context, "/add");
+              setState(() {
+                if (data != null) _loadingData = data['reload'];
+              });
+            },
+            onLongPress: () => showError(
+              context,
+              "Add your sleep time!",
+              error: false,
+            ),
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.add_alarm_sharp),
+            onLongPress: () => showError(
+              context,
+              "Start the sleep timer!",
+              error: false,
+            ),
+          ),
+        ],
         child: const Icon(Icons.nightlight_round_rounded),
       ),
       backgroundColor: Colors.grey[900],

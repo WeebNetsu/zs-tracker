@@ -47,6 +47,12 @@ class NavigationDrawer extends StatelessWidget {
             const SizedBox(height: 50),
             _buildMenuItem(
               context,
+              text: "Notes",
+              icon: Icons.notes,
+              url: "/notes",
+            ),
+            _buildMenuItem(
+              context,
               text: "Stats",
               icon: Icons.bar_chart,
               url: "/stats",
