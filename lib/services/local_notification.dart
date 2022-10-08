@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -15,12 +16,16 @@ class LocalNotificationService {
   final BehaviorSubject<String?> onNotificationClick = BehaviorSubject();
 
   void _onDidReceiveLocalNotification(
-      int id, String? title, String? body, String? payload) {
-    print("ID: $id");
+    int id,
+    String? title,
+    String? body,
+    String? payload,
+  ) {
+    debugPrint("ID: $id");
   }
 
   void _onSelectNotification(String? payload) {
-    print("PAYLOAD $payload");
+    debugPrint("PAYLOAD $payload");
 
     if (payload != null && payload.isNotEmpty) {
       onNotificationClick.add(payload);
@@ -36,16 +41,21 @@ class LocalNotificationService {
 
     IOSInitializationSettings iosInitializationSettings =
         IOSInitializationSettings(
-            requestAlertPermission: true,
-            requestBadgePermission: true,
-            requestSoundPermission: true,
-            onDidReceiveLocalNotification: _onDidReceiveLocalNotification);
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      onDidReceiveLocalNotification: _onDidReceiveLocalNotification,
+    );
 
     final InitializationSettings settings = InitializationSettings(
-        android: androidInitializationSettings, iOS: iosInitializationSettings);
+      android: androidInitializationSettings,
+      iOS: iosInitializationSettings,
+    );
 
-    await _localNotificationService.initialize(settings,
-        onSelectNotification: _onSelectNotification);
+    await _localNotificationService.initialize(
+      settings,
+      onSelectNotification: _onSelectNotification,
+    );
   }
 
   Future<NotificationDetails> _notificationDetails() async {
@@ -76,8 +86,13 @@ class LocalNotificationService {
   }) async {
     final details = await _notificationDetails();
 
-    await _localNotificationService.show(id, title, body, details,
-        payload: payload);
+    await _localNotificationService.show(
+      id,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
   }
 
   Future<void> showSheduledNotifcation({

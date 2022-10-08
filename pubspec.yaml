@@ -51,6 +51,8 @@ dependencies:
   permission_handler: ^10.0.0
   # to draw graphs and charts
   graphic: ^0.10.5
+  # for charts (possible graphic replacement?)
+  fl_chart: ^0.55.2
   # open up share dialog to send something over social media
   share_plus: ^4.0.10
   # to send the user notifications
@@ -59,7 +61,7 @@ dependencies:
   rxdart: ^0.27.5
   # so we can have a FAB with multiple options
   flutter_speed_dial: ^6.0.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

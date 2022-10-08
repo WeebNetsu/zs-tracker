@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:graphic/graphic.dart';
 import 'package:zs_tracker/models/sleep.dart';
@@ -85,7 +86,65 @@ class _StatsPageState extends State<StatsPage> {
       ),
       body: _loadingData
           ? const CircularProgressIndicator()
-          : ListView(
+          : /* BarChart(
+              BarChartData(
+                // read about it in the BarChartData section
+                maxY: 24,
+                minY: 0,
+                barGroups: [
+                  ...filteredSleeps
+                      .map((fs) => BarChartGroupData(
+                            x: 0,
+                            barRods: [
+                              BarChartRodData(
+                                toY: 10,
+                                width: 10,
+                              )
+                            ],
+                          ))
+                      .toList(),
+                  BarChartGroupData(
+                    x: 0,
+                    barRods: [
+                      BarChartRodData(
+                        toY: 10,
+                        width: 10,
+                      )
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 1,
+                    barRods: [
+                      BarChartRodData(
+                        toY: 5,
+                        width: 10,
+                      )
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 2,
+                    barRods: [
+                      BarChartRodData(
+                        toY: 0,
+                        width: 10,
+                      )
+                    ],
+                  ),
+                  BarChartGroupData(
+                    x: 3,
+                    barRods: [
+                      BarChartRodData(
+                        toY: 15,
+                        width: 10,
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              swapAnimationDuration: Duration(milliseconds: 150), // Optional
+              swapAnimationCurve: Curves.linear, // Optional
+            ), */
+          ListView(
               children: [
                 const Padding(
                   padding: EdgeInsets.only(top: 8),
