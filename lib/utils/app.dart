@@ -34,6 +34,7 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
     if (items != null) {
       final x = await SQLiteWrapper().openDB("${appDir.path}/save.db");
       print(x);
+      SQLiteWrapper().closeDB();
 
       /* JSON method
       String newSleeps = "";
@@ -53,7 +54,20 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
       ); */
     } else {
       // if appending
-      final x = await SQLiteWrapper().openDB("${appDir.path}/save.sqlite");
+      final x = await SQLiteWrapper().openDB("${appDir.path}/save.sqlite", onCreate: () async {
+        await SQLiteWrapper().query("""
+            CREATE TABLE sleeps (
+                id string unique primary key,
+                start int,
+                end int,
+                rating int,
+                notes string
+            );
+            """);
+      });
+
+      await SQLiteWrapper().insert(item!.toJson(), "sleeps");
+
       SQLiteWrapper().closeDB();
 
       /* JSON method

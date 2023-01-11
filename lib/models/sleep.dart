@@ -32,8 +32,8 @@ class SleepModel {
   /// Convert model data to JSON format
   Map<String, dynamic> toJson() => {
         'id': _id,
-        'start': _startTime.toString(),
-        'end': _endTime.toString(),
+        'start': _startTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
+        'end': _endTime.millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond,
         'rating': _rating,
         'notes': _notes,
       };
