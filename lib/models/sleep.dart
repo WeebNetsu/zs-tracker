@@ -13,8 +13,7 @@ class SleepModel {
   late String _id;
   final uuid = const Uuid();
 
-  SleepModel(this._startTime, this._endTime, int rating, this._notes,
-      {String? id}) {
+  SleepModel(this._startTime, this._endTime, int rating, this._notes, {String? id}) {
     _id = id ?? uuid.v4();
     // rating is maxed at 5 and minimumed at 0
     _rating = max(min(rating, 5), 0);

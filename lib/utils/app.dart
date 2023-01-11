@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite_wrapper/sqlite_wrapper.dart';
 import 'package:zs_tracker/models/sleep.dart';
 
 Future<Directory?> getAppDir() async {
@@ -26,11 +27,15 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
   }
 
   // create will not overwrite existing data
-  final newFile = await File("${appDir.path}/save.json").create();
+//   final newFile = await File("${appDir.path}/save.db").create();
 
   try {
     // if overwriting
     if (items != null) {
+      final x = await SQLiteWrapper().openDB("${appDir.path}/save.db");
+      print(x);
+
+      /* JSON method
       String newSleeps = "";
       for (var sleep in items) {
         newSleeps += "${jsonEncode(sleep.toJson())},";
@@ -45,9 +50,13 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
       await newFile.writeAsString(
         newSleeps,
         mode: FileMode.write,
-      );
+      ); */
     } else {
       // if appending
+      final x = await SQLiteWrapper().openDB("${appDir.path}/save.sqlite");
+      SQLiteWrapper().closeDB();
+
+      /* JSON method
       if (newFile.readAsLinesSync().isEmpty) {
         await newFile.writeAsString(
           jsonEncode(item!.toJson()),
@@ -58,7 +67,7 @@ Future<bool> saveSleepData({SleepModel? item, List<SleepModel>? items}) async {
           ",${jsonEncode(item!.toJson())}",
           mode: FileMode.append,
         );
-      }
+      } */
     }
 
     return true;
